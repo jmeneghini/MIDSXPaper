@@ -6,8 +6,8 @@
 % rsi,
 cp,  % Conference Proceedings
  amsmath,amssymb,%nobibnotes,
- preprint,%
-% reprint,%
+%  preprint,%
+reprint,%
 %author-year,%
 %author-numerical,%
 ]{revtex4-2}
@@ -101,11 +101,51 @@ If a delta interaction does not occur, then a real interaction is sampled. There
 \end{equation}
 where $P_\delta$ is given by Eq. \ref{eq:4}.
 \\
+\par If a real interaction occurs in material M, then probability of interaction $i$ occurring is
+\begin{equation}
+    P_i = \frac{\sigma_i(E, M)}{\sigma (E, M)},
+\end{equation}
+where $\sigma_i$ is the cross-section of interaction $i$.\\
+
+If there are $N$ possible interactions for a particular $E$ and $M$, then $\sigma (E, M)$ is calculated as so
+
+\begin{equation}
+    \sigma (E, M) = \sum_{i=1}^{N} \sigma_i(E, M).
+\end{equation}
+
+
 \par For x-rays, there are three possible photon interactions: \\
 
-\large{\bf{1. Photoelectric Effect}}
+\begin{large}
+    \bf{1. Photoelectric Effect}
+\end{large}
 
-In the following model for the photoelectric effect, 
+\par In the photoelectric effect model used in MIDSX, a rather simple approach is taken. When a photon interacts with an atom's electron, the photon is terminated and all energy is deposited at the location of interaction. In general purpose particle transport code systems, when a photoelectric interaction occurs, a photon of energy $E$ is absorbed by an electron in subshell $i$, causing the electron to leave the atom with energy $E_e = E - U_i$, where $U_i$ is the binding energy of the $i$th subshell. In addition, photons are emitted due to atomic relaxations. For photon energies in the medical imaging range (30 - 120 keV), the energy of the released electrons does not allow for significant traversal through typically used materials, such as tissue, bone, and fat. This limited traversal results in a localized dose distribution, in turn, validating the model used by MIDSX. \\
+
+\begin{large}
+    \bf{2. Coherent Scattering}
+\end{large}
+
+\par Thomson scattering is defined as an incoming photon of energy $E$ elastically scattering with a free electron at rest, resulting in a scattered photon of energy $E$. The atomic DCS per unit solid angle $\Omega$ for the interaction can be derived with classical electrodynamics, and is given by
+
+\begin{equation}
+    \frac{d\sigma_T}{d\Omega} = r_e^2 \frac{1 + \cos^2(\theta)}{2},
+\end{equation}
+where $r_e^2$ is the classical electron radius. \\
+In an atom, photons scatter off bound electrons rather than the free electrons described by Thomson scattering, resulting in what is known as coherent (Rayleigh) scattering. The DCS per unit solid angle $\Omega$ of the interaction, ignoring absorption edge effects, is given by
+
+\begin{equation}
+    \frac{d\sigma_{Co}}{d\Omega} = \frac{d\sigma_T}{d\Omega} F(x, Z),
+\end{equation}
+
+where $x$ is the momentum transfer between the photon and atom, $Z$ is the atomic number of the atom, and $F(x, Z)$ is the atomic form factor.
+
+
+\begin{equation}
+    x = 
+\end{equation}
+
+
 
 \section{METHODS}
 
@@ -120,9 +160,7 @@ REV\TeX{}, offering suggestions and encouragement, testing new versions,
 \end{acknowledgments}
 
 \nocite{*}
-\bibliography{aipsamp}% Produces the bibliography via BibTeX.
+\bibliography{main.bib}
 
 \end{document}
-%
-% ****** End of file aipsamp.tex ******
 
