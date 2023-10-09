@@ -126,28 +126,143 @@ If there are $N$ possible interactions for a particular $E$ and $M$, then $\sigm
     \bf{2. Coherent Scattering}
 \end{large}
 
-\par Thomson scattering is defined as an incoming photon of energy $E$ elastically scattering with a free electron at rest, resulting in a scattered photon of energy $E$. The atomic DCS per unit solid angle $\Omega$ for the interaction can be derived with classical electrodynamics, and is given by
+\par Thomson scattering is defined as an incoming photon of energy $E$ elastically scattering with a free electron at rest, resulting in a scattered photon of same energy $E$. The atomic DCS per unit solid angle $\Omega$ for the interaction can be derived with classical electrodynamics, and is given by
 
 \begin{equation}
     \frac{d\sigma_T}{d\Omega} = r_e^2 \frac{1 + \cos^2(\theta)}{2},
 \end{equation}
 where $r_e^2$ is the classical electron radius. \\
-In an atom, photons scatter off bound electrons rather than the free electrons described by Thomson scattering, resulting in what is known as coherent (Rayleigh) scattering. The DCS per unit solid angle $\Omega$ of the interaction, ignoring absorption edge effects, is given by
+In an atom, photons scatter off bound electrons rather than the free electrons described by Thomson scattering, resulting in what is known as coherent (Rayleigh) scattering at . The DCS per unit solid angle $\Omega$ of the interaction, ignoring absorption edge effects, is given by
 
 \begin{equation}
     \frac{d\sigma_{Co}}{d\Omega} = \frac{d\sigma_T}{d\Omega} F(x, Z),
 \end{equation}
 
-where $x$ is the momentum transfer between the photon and atom, $Z$ is the atomic number of the atom, and $F(x, Z)$ is the atomic form factor.
+where $x$ is the momentum transfer between the photon and atom, $Z$ is the atomic number of the atom, and $F(x, Z)$ is the atomic form factor. $x$ is related to the scattering angle $\theta$ by
 
 
 \begin{equation}
-    x = 
+    x = ak\sqrt{1 - \cos\theta},
 \end{equation}
+
+where
+
+\begin{equation}
+    a = \frac{m_e c^2}{\sqrt{2}hc},
+\end{equation}
+
+and
+
+\begin{equation}
+    k = \frac{E}{m_e c^2},
+\end{equation}
+
+where $m_e$ is the mass of an electron, $c$ is the speed of light, and $h$ is Planck's constant. \\
+
+The DCS per unit solid angle $\Omega$ can be integrated over $\phi$ to obtain the DCS per unit polar angle $\theta$:
+
+
+\begin{equation}
+    \frac{d\sigma_{Co}}{d\theta} = \pi r_e^2 \sin \theta (1 + \cos^2 \theta) F(x, Z)^2.
+\end{equation}
+
+\par The PDF of the polar angle $\theta$ is then given by
+
+\begin{equation}
+    p(\theta) d\theta = \frac{d\sigma_{Co}}{d\theta} \frac{1}{\sigma_{Co}} d\theta = \frac{\pi r_e^2}{\sigma_{Co}} \sin \theta (1 + \cos^2 \theta) F(x, Z)^2 d \theta.
+\end{equation}
+
+\par The PDF of $\theta$ can be transformed into a PDF of $\mu = \cos \theta$, resulting in
+
+\begin{equation}
+    p(\mu) = \frac{\pi r_e^2}{\sigma_{Co}} (1 + \mu^2) F(x, Z)^2.
+\end{equation}
+
+To then sample $\mu$ for a particular scattering event, the inversion method is used. In particular, a look up table for the CDF of $P(\mu)$ is generated for each material in the domain for a grid of $\mu$ values. The details of this algorithm are discussed in Appendix ... \\
+
+\begin{large}
+    \bf{3. Incoherent Scattering}
+\end{large}
+
+\par Incoherent (Compton) scattering is defined as an incoming photon of energy $E$ interacting with an atom's electron, resulting in a scattered photon of energy $E'$ and an released electron with energy $E_e = E - E' - U_i$, where $U_i$ is the binding energy of the interacting subshell. While coherent scattering effectively interacts with atom itself, incoherent scattering interacts with the electron. The DCS per unit solid angle $\Omega$ of the interaction was derived by Klein and Nishina in 1929, making it one of the first findings of quantum electrodynamics. The Klein-Nishina formula is given by
+
+\begin{equation}
+    \frac{d\sigma_{KN}}{d\Omega} = \frac{r_e^2}{2} \left(\frac{E'}{E}\right)^2 \left(\frac{E'}{E} + \frac{E}{E'} - \sin^2 \theta \right),
+\end{equation}
+
+\par Note that when $E' = E$, the KN DCS is equal to the Thomson DCS, showing that incoherent scattering is a generalization of coherent scattering for inelastic interactions. \\
+
+\par Applying conservation of energy and momentum to free electron at rest, the following equation can be derived relating the scattered photon energy $E'$ to the scattering angle $\theta$ and the incident photon energy $E$:
+
+\begin{equation}
+    E' = \frac{E}{1 + k(1 - \cos \theta)}.
+\end{equation}
+
+\par Similar to the Thomson DCS, the KN DCS assumes a free electron at rest. In an atom, the electron is bound, resulting in a modified DCS. In the case of incoherent scattering, the KN DCS is modified by the Coherent Scattering Function, making the DCS per unit solid angle $\Omega$ of the interaction
+
+\begin{equation}
+    \frac{d\sigma_{In}}{d\Omega} = \frac{d\sigma_{KN}}{d\Omega} S(x, Z).
+\end{equation}
+
+
+Instead of directly sampling the PDF of the DCS, $\mu$ is first sampled using the acceptance-rejection method developed by Ozmutlu, then $S(x, Z)$ is sampled once again with the acceptance-rejection method. The details of this algorithm are discussed in Appendix ... \\
+
 
 
 
 \section{METHODS}
+
+In order to simulate the transport of x-rays through a domain, the following is required:
+
+\begin{enumerate}
+    \item The geometry of the domain
+    \item The materials in the domain
+    \item The associated cross-sections, form factors, and scattering functions of the materials
+    \item The source of the x-rays (energy spectrum, position, and direction)
+    \item The number of photons to simulate
+\end{enumerate}
+
+and to retrieve information about the performed simulation, the following is required:
+
+\begin{enumerate}
+    \item Geometries to check for intersection
+    \item Quantities to tally
+    \item Derived quantities to calculate from tallied quantities
+\end{enumerate}
+
+\subsection{GEOMETRY}
+\par In MIDSX, the geometry of the domain is represented by a 3D array of voxels, with each voxel being assigned a material ID. The domain is assigned a particular size, indicated by its spatial extent along the x, y, and z dimensions. In addition, the domain is assigned a background material ID. Geometries inside the domain are specified by NIFTI files. These NIFTI files are assigned material IDs, spatial size, voxel size, and an origin, which is the location of the voxel in the domain that corresponds to the origin of the NIFTI file. After constructing the NIFTI files, the domain is defined by supplying the background material ID, domain size, and a list of NIFTI files into a custom .domain file, which is then read by the MIDSX executable. \\
+\par In the code, both a VoxelGrid and ComputationalDomain object are created, with the ComputationalDomain consisting of the specified dimensions, background material ID, and a vector of VoxelGrid objects which are created via the provided NIFTI files. Do determine the current material of a photon, it is first determined if the photon is inside the ComputationalDomain. If so, it then checks if the photon is inside any of the VoxelGrid objects. If so, it is then determined which Voxel the photon is located inside the Voxel, then the corresponding material ID is returned. If the photon is not inside the ComputationalDomain, then the photon is terminated. \\
+
+\subsection{MATERIALS \& DATA}
+\par In order to simulate the transport of x-rays through a domain, the materials in the domain must be specified. In MIDSX, materials are all defined in an SQLite database, which is read by the MIDSX executable. The database contains the following information for each element:
+
+\begin{enumerate}
+    \item Symbol
+    \item Atomic Number
+    \item Mass
+    \item Mass Density
+    \item Number Density
+    \item Mass Number
+\end{enumerate}
+
+All of the above data was obtained from the periodictable and mendeleev python packages. In addition, the database contains the following data from the EPDL database for each element:
+
+\begin{enumerate}
+    \item Total Microscopic Cross-Section
+    \item Photoelectric Microscopic Cross-Section
+    \item Coherent Scattering Microscopic Cross-Section
+    \item Incoherent Scattering Microscopic Cross-Section
+    \item Atomic Form Factor
+    \item Scattering Function
+\end{enumerate}
+
+\par In MIDSX, all the above data is initialized upon created creation of the InteractionData object with a vector of strings of materials names. These material names correspond to entries in the SQLite database, which contains a table of material compositions and mass densities which were obtained from NIST's XCOM database. The InteractionData object contains a map of Material objects with their names, along with additional computed data, such as the maximum cross-section which is used for delta-tracking. The Material objects construct the above data for the specified material by performing an additivity approximation of the data for each element in the material (ref). The data is seperated into two further objects: MaterialData and MaterialProperties. MaterialData contains the microscopic cross-sections, form factors, and scattering functions, while MaterialProperties contains the mass density, number density, and mass.
+
+In addition to retrieving and storing the above data, the MaterialData object constructs interpolators for all its data. The interpolators for each type of data vary depending on its shape. For example, the photoelectric and total cross-sections are interpolated with a log-log linear interpolator, while the incoherent and coherent cross-sections are interpolated with a log-log cubic spline interpolator. Below is a figure of .\\
+
+
+
 
 
 
