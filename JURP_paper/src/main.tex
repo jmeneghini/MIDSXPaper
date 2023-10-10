@@ -261,6 +261,12 @@ All of the above data was obtained from the periodictable and mendeleev python p
 
 In addition to retrieving and storing the above data, the MaterialData object constructs interpolators for all its data. The interpolators for each type of data vary depending on its shape. For example, the photoelectric and total cross-sections are interpolated with a log-log linear interpolator, while the incoherent and coherent cross-sections are interpolated with a log-log cubic spline interpolator. Below is a figure of .\\
 
+\subsection{Source}
+    To create generate the initial position, direction, and energy of a photon, a PhotonSource object is initialized with a SourceGeometry, Directionality, and an EnergySpectrum object. The three initializing object are virtual classes, allowing the user to specify the attributes of the source. The inheritance structure is shown in Fig (). 
+
+
+\subsection{Geometries}
+
 
 
 
