@@ -20,6 +20,7 @@ reprint,%
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{float}
 
 %% Loads a Times-like font. You can also load
 %% {newtxtext,newtxtmath}, but not {times}, 
@@ -267,9 +268,63 @@ In addition to retrieving and storing the above data, the MaterialData object co
     To create generate the initial position, direction, and energy of a photon, a PhotonSource object is initialized with a SourceGeometry, Directionality, and an EnergySpectrum object. The three initializing object are virtual classes, allowing the user to specify the attributes of the source. The inheritance structure is shown in Fig (). 
 
 
-\subsection{Geometries}
+\subsection{Tallies}
+\par To measure simulation data, one must first decide when to trigger the measurement. In particular, MIDSX supports both surface and volume geometries that trigger when a photon passes through or enters the geometry, respectfully. For surfaces, users can choose discs and rectangles, while for volumes, there are only cuboids at the moment.
+\par At the start of the simulations, users can specify quantities that they want measured upon the trigger of a specific geometry. For surfaces, these include incident photon energy, entrance cosine, and number of photons, while for volumes, in addition to their own implementation of incident energy and number of photons, the quantities energy deposition and number of interactions are available for measurement. Furthermore, each quantity has the ability to specify between photons that underwent a single coherent scatter, a single incoherent scatter, multiple scatters, and no scatters. While this does noticeably increase the computation time, it was necessary to validate the interaction models used in MIDSX.
+\par At the end of simulation, one might want to calculate additional derived quantities from the tallied quantities from the simulation. With this mind, MIDSX contains a DerivedQuantity object that can calculate planar fluence and air kerma, which were initially implemented for half-value-layer experiments.
+\vspace{1cm}
+\par Using the described theory and methodology, the object PhysicsEngine transports a photon through the computational domain until termination. This process is described in Figure \ref{figure:PhysicsEngineFlowChart}.
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[scale=0.8]{../figures/physics_engine_flow_chart.pdf}
+	\caption{Diagram of GE MiniView 6800 Mini C-Arm used in effective energy measurements.}
+	\label{figure:PhysicsEngineFlowChart}
+\end{figure}
 
 
+\section{Results}
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1.0\textwidth]{../figures/HVL_and_QVL_paper_ready.pdf}
+	\caption{HVL experiment of Al. (a) HVL, (b) QVL.}
+	\label{figure:HVLGraph}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1.0\textwidth]{../figures/ROI_0_deg_paper_ready.pdf}
+	\caption{Radiography full-field $0^\circ$ ROI at 56.4 keV. (a) primary, (b) incoherent, (c) coherent, (d) multiple.}
+	\label{figure:HVLGraph}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1.0\textwidth]{../figures/ROI_0_deg_pencil_paper_ready.pdf}
+	\caption{Radiography pencil $0^\circ$ ROI at 56.4 keV. (a) incoherent, (b) coherent, (c) multiple.}
+	\label{figure:HVLGraph}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1.0\textwidth]{../figures/radiography_body_dep_paper_ready.pdf}
+	\caption{Radiography body deposition full-field. (a) 0 degree, (b) 15 degree.}
+	\label{figure:HVLGraph}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1.0\textwidth]{../figures/VOI_paper_ready.pdf}
+	\caption{Radiography VOI deposition full-field. (a) $0^\circ$, 56.4 keV; (b) $0^\circ$, 120 kVp; (c) $15^\circ$, 56.4 keV; (d) $15^\circ$, 120 kVp}
+	\label{figure:HVLGraph}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=1.0\textwidth]{../figures/CT_564_180.pdf}
+	\caption{CT of voxelized geometry at $180^\circ$ and 56.4 keV.}
+	\label{figure:HVLGraph}
+\end{figure}
 
 
 
