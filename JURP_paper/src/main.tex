@@ -37,6 +37,8 @@ reprint,%
 \bm{\hat{#1}_{#2}^{#3}}
 }
 
+\newcommand{\code}[1]{\texttt{#1}}
+
 \begin{document}
 
 \title{Monte Carlo Simulation of X-ray Transport}% Force line breaks with \\
@@ -66,21 +68,21 @@ secondary publications and for information retrieval purposes.
 \par In order to represent the computational domain discretely, space is broken up into a grid of voxels (a pixel with volume), with each voxel being assigned a particular material ID depending on the geometries and compounds/elements in the domain. With our discrete space, given a photon position $\vecb{r}{}{}$, the corresponding voxel in which the photon resides can be calculated. Therefore, a particular material can be associated with all possible $\vecb{r}{}{}$'s in the domain.
 
 \par A photon's position in space after taking the $n$-th step in the domain $\vecb{r}{n}{}$ is represented by the following parametric ray equation:
-\begin{equation}
+\begin{equation}\label{eq:1}
     \vecb{r}{n}{} = \vecb{r}{n-1}{} + \uvecb{d}{}{} t_n,
 \end{equation}
 where $\vecb{r}{n-1}{}$ is the initial position before the $n$-th step, $\uvecb{d}{}{}$ is a unit vector in the direction of the step, and $t_n$ is the distance of the $n$-th step.
 
 \par In order to sample $t_n$, we utilize the following probability distribution function (PDF) $p(t)$ of the distance traveled $t$ by a photon of energy $E$ through material $M$ before interacting:
-\begin{equation}
-p(t) = n\sigma \exp{\left[-t(n\sigma)\right]},
+\begin{equation}\label{eq:2}
+    p(t) = n\sigma \exp{\left[-t(n\sigma)\right]},
 \end{equation}
 where $n$ is the number density of $M$ and $\sigma = \sigma(E, M)$ is the microscopic cross-section of $M$ at $E$.
 \par Using the inversion method for sampling a PDF, it follows that random values of the free path $t$ can be generated with the following equation:
-\begin{equation}
+\begin{equation}\label{eq:3}
     t = -\frac{1}{n\sigma} \ln \gamma,
 \end{equation}
-where $\gamma$ is a uniformly distributed random number in the interval $(0, 1)$.
+where $\gamma$ is a uniformly distributed random number in the interval $(0, 1)$. This value of $t$ is sampled for each step and is used as $t_n$ in Eq \ref{eq:1} to determine the length of the $n$-th step.
 \\
 
 \subsection{SURFACE AND DELTA-TRACKING}
@@ -150,15 +152,9 @@ where $x$ is the momentum transfer between the photon and atom, $Z$ is the atomi
 
 where
 
-\begin{equation}
-    a = \frac{m_e c^2}{\sqrt{2}hc},
-\end{equation}
-
-and
-
-\begin{equation}
-    k = \frac{E}{m_e c^2},
-\end{equation}
+\begin{align}
+    a = \frac{m_e c^2}{\sqrt{2}hc} && \rm{and} && k = \frac{E}{m_e c^2},
+\end{align}
 
 where $m_e$ is the mass of an electron, $c$ is the speed of light, and $h$ is Planck's constant. \\
 
@@ -235,7 +231,7 @@ and to retrieve information about the performed simulation, the following is req
 
 \subsection{GEOMETRY}
 \par In MIDSX, the geometry of the domain is represented by a 3D array of voxels, with each voxel being assigned a material ID. The domain is assigned a particular size, indicated by its spatial extent along the x, y, and z dimensions. In addition, the domain is assigned a background material ID. Geometries inside the domain are specified by NIFTI files. These NIFTI files are assigned material IDs, spatial size, voxel size, and an origin, which is the location of the voxel in the domain that corresponds to the origin of the NIFTI file. After constructing the NIFTI files, the domain is defined by supplying the background material ID, domain size, and a list of NIFTI files into a custom .domain file, which is then read by the MIDSX executable. \\
-\par In the code, both a VoxelGrid and ComputationalDomain object are created, with the ComputationalDomain consisting of the specified dimensions, background material ID, and a vector of VoxelGrid objects which are created via the provided NIFTI files. Do determine the current material of a photon, it is first determined if the photon is inside the ComputationalDomain. If so, it then checks if the photon is inside any of the VoxelGrid objects. If so, it is then determined which Voxel the photon is located inside the Voxel, then the corresponding material ID is returned. If the photon is not inside the ComputationalDomain, then the photon is terminated. \\
+\par In the code, both a \code{VoxelGrid} and \code{ComputationalDomain} object are created, with the ComputationalDomain consisting of the specified dimensions, background material ID, and a vector of VoxelGrid objects which are created via the provided NIFTI files. Do determine the current material of a photon, it is first determined if the photon is inside the ComputationalDomain. If so, it then checks if the photon is inside any of the VoxelGrid objects. If so, it is then determined which Voxel the photon is located inside the Voxel, then the corresponding material ID is returned. If the photon is not inside the ComputationalDomain, then the photon is terminated. \\
 
 \subsection{MATERIALS \& DATA}
 \par In order to simulate the transport of x-rays through a domain, the materials in the domain must be specified. In MIDSX, materials are all defined in an SQLite database, which is read by the MIDSX executable. The database contains the following information for each element:
@@ -275,55 +271,60 @@ In addition to retrieving and storing the above data, the MaterialData object co
 \vspace{1cm}
 \par Using the described theory and methodology, the object PhysicsEngine transports a photon through the computational domain until termination. This process is described in Figure \ref{figure:PhysicsEngineFlowChart}.
 
+
+
 \begin{figure}[H]
     \centering
-	\includegraphics[scale=0.8]{../figures/physics_engine_flow_chart.pdf}
+	\includegraphics[width=1.0\textwidth]{../figures/physics_engine_flow_chart.pdf}
 	\caption{Diagram of GE MiniView 6800 Mini C-Arm used in effective energy measurements.}
 	\label{figure:PhysicsEngineFlowChart}
 \end{figure}
 
 
+\newpage
 \section{Results}
+\par In order to validate the accuracy of MIDSX, half-value layer, radiography, and voxelized-volume simulations were performed and compared to reference data obtained by Sechopoulos et al \cite{sechopoulos_monte_2015}; these simulations correspond to cases 1, 2, and 5, respectively.
+
 \begin{figure}[H]
     \centering
 	\includegraphics[width=1.0\textwidth]{../figures/HVL_and_QVL_paper_ready.pdf}
-	\caption{HVL experiment of Al. (a) HVL, (b) QVL.}
+	\caption{Results for the (a) HVL and (b) QVL simulations as described by Case 1. The ratios of the primary HVL and QVL air kermas to the primary background air kermas is represented by $R_1$ and $R_2$, respectively. The simulation was performed for the monoenergetic energies 30 keV and 100 keV, along with the polyenergetic spectrums of 30 kVp and 100 kVp, which were provided by Sechopoulos et al.}
 	\label{figure:HVLGraph}
 \end{figure}
 
 \begin{figure}[H]
     \centering
 	\includegraphics[width=1.0\textwidth]{../figures/ROI_0_deg_paper_ready.pdf}
-	\caption{Radiography full-field $0^\circ$ ROI at 56.4 keV. (a) primary, (b) incoherent, (c) coherent, (d) multiple.}
-	\label{figure:HVLGraph}
+	\caption{The energy per initial photon (eV/photon) of photons incident upon each region of interest (ROI) for the $0^\circ$, full-field, 56.4 keV simulation as described by Case 2. The incident energy was determined separately for photons that underwent (a) no real interactions, (b) a single incoherent scatter, (c) a single coherent scatter, (d) and multiple scatters.}
+	\label{figure:ROIFFGraph}
 \end{figure}
 
 \begin{figure}[H]
     \centering
 	\includegraphics[width=1.0\textwidth]{../figures/ROI_0_deg_pencil_paper_ready.pdf}
-	\caption{Radiography pencil $0^\circ$ ROI at 56.4 keV. (a) incoherent, (b) coherent, (c) multiple.}
-	\label{figure:HVLGraph}
+	\caption{The energy per initial photon (eV/photon) of photons incident upon each region of interest (ROI) for the $0^\circ$, pencil beam, 56.4 keV simulation as described by Case 2. The incident energy was determined separately for photons that underwent (a) a single incoherent scatter, (b) a single coherent scatter, (c) and multiple scatters.}
+	\label{figure:ROIPGraph}
 \end{figure}
 
 \begin{figure}[H]
     \centering
 	\includegraphics[width=1.0\textwidth]{../figures/radiography_body_dep_paper_ready.pdf}
-	\caption{Radiography body deposition full-field. (a) 0 degree, (b) 15 degree.}
-	\label{figure:HVLGraph}
+	\caption{The energy deposited per initial photon (eV/photon) in the simulated tissue for the full-field simulation as described by Case 2. The simulation was performed at 56.4 keV and 120 kVp at both (a) $0^\circ$ and (b) $15^\circ$, with the 120 kVp spectrum provided by Sechopoulos et al.}
+ 	\label{figure:BDGraph}
 \end{figure}
 
 \begin{figure}[H]
     \centering
 	\includegraphics[width=1.0\textwidth]{../figures/VOI_paper_ready.pdf}
-	\caption{Radiography VOI deposition full-field. (a) $0^\circ$, 56.4 keV; (b) $0^\circ$, 120 kVp; (c) $15^\circ$, 56.4 keV; (d) $15^\circ$, 120 kVp}
-	\label{figure:HVLGraph}
+	\caption{The energy deposited per initial photon (eV/photon) in the volumes of interests (VOIs) for the $0^\circ$, full field, 56.4 keV simulation as described by Case 2. The energy deposited was determined separately for photons that underwent (a) no real interactions, (b) a single incoherent scatter, (c) a single coherent scatter, (d) and multiple scatters.}
+	\label{figure:VOIFFGraph}
 \end{figure}
 
 \begin{figure}[H]
     \centering
 	\includegraphics[width=1.0\textwidth]{../figures/CT_564_180.pdf}
-	\caption{CT of voxelized geometry at $180^\circ$ and 56.4 keV.}
-	\label{figure:HVLGraph}
+	\caption{The energy deposited per initial photon (eV/photon) in the material IDs for the $180^\circ$, 56.4 keV simulation as described by Case 5.}
+	\label{figure:CTGraph}
 \end{figure}
 
 
@@ -337,7 +338,7 @@ REV\TeX{}, offering suggestions and encouragement, testing new versions,
 \dots.
 \end{acknowledgments}
 
-\nocite{*}
+% \nocite{*}
 \bibliography{main.bib}
 
 \end{document}
