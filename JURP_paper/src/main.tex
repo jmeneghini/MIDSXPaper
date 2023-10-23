@@ -22,12 +22,17 @@ reprint,%
 \usepackage[T1]{fontenc}
 \usepackage{float}
 
+\usepackage{afterpage}
+\usepackage{placeins}
+
+\bibliographystyle{plainnat}
+
+
 %% Loads a Times-like font. You can also load
 %% {newtxtext,newtxtmath}, but not {times}, 
 %% {txfonts} nor {mathtpm} as these packages
 %% are obsolete and have been known to cause problems.
 \usepackage{mathptmx}
-% \usepackage{newtx}
 
 \newcommand{\vecb}[3]{
 \bm{\vec{#1}_{#2}^{#3}}
@@ -64,268 +69,17 @@ secondary publications and for information retrieval purposes.
 
 
 
-\section{TRANSPORT THEORY}
-\par In order to represent the computational domain discretely, space is broken up into a grid of voxels (a pixel with volume), with each voxel being assigned a particular material ID depending on the geometries and compounds/elements in the domain. With our discrete space, given a photon position $\vecb{r}{}{}$, the corresponding voxel in which the photon resides can be calculated. Therefore, a particular material can be associated with all possible $\vecb{r}{}{}$'s in the domain.
+\input{theory.tex}
 
-\par A photon's position in space after taking the $n$-th step in the domain $\vecb{r}{n}{}$ is represented by the following parametric ray equation:
-\begin{equation}\label{eq:1}
-    \vecb{r}{n}{} = \vecb{r}{n-1}{} + \uvecb{d}{}{} t_n,
-\end{equation}
-where $\vecb{r}{n-1}{}$ is the initial position before the $n$-th step, $\uvecb{d}{}{}$ is a unit vector in the direction of the step, and $t_n$ is the distance of the $n$-th step.
 
-\par In order to sample $t_n$, we utilize the following probability distribution function (PDF) $p(t)$ of the distance traveled $t$ by a photon of energy $E$ through material $M$ before interacting:
-\begin{equation}\label{eq:2}
-    p(t) = n\sigma \exp{\left[-t(n\sigma)\right]},
-\end{equation}
-where $n$ is the number density of $M$ and $\sigma = \sigma(E, M)$ is the microscopic cross-section of $M$ at $E$.
-\par Using the inversion method for sampling a PDF, it follows that random values of the free path $t$ can be generated with the following equation:
-\begin{equation}\label{eq:3}
-    t = -\frac{1}{n\sigma} \ln \gamma,
-\end{equation}
-where $\gamma$ is a uniformly distributed random number in the interval $(0, 1)$. This value of $t$ is sampled for each step and is used as $t_n$ in Eq \ref{eq:1} to determine the length of the $n$-th step.
-\\
 
-\subsection{SURFACE AND DELTA-TRACKING}
+\input{methods.tex}
 
-\par If, after taking a step, the photon lands in a voxel with a different material, then the corresponding free path for the new material to be accounted for. This method, called surface-tracking, requires photons to be stopped at voxel boundaries and intersections with surrounding voxels to be calculated, which can be computationally intensive for materials that have a large average free path. 
-\par Alternatively, the delta-tracking algorithm offers a solution by sampling the maximum cross-section $\sigma_{\text{max}}$ in the computational domain. This, in turn, brings down the average free path to the minimum in the domain. To account for this decrease in free path, the algorithm introduces delta interactions as an alternative to real interactions, resulting in no change to the energy or direction. The probability of delta interaction $P_{\delta}$ is given by the following equation:
+\input{results.tex}
 
-\begin{equation} \label{eq:4}
-    P_{\delta} = \frac{\sigma_{\text{max}}(E) - \sigma(E, M)}{\sigma_{\text{max}}(E)},
-\end{equation}
 
-where $E$ is the energy of the photon undergoing the step, and $M$ is the material corresponding to the position of the photon at the end of the step. Note that when the photon lands in the material corresponding to the maximum cross-section, $\sigma(E, M) = \sigma_{\text{max}}$ and $P_{\delta} = 0$. On the contrary, if the photon landed in air and the domain's maximum cross-section corresponded to lead, then $\sigma(E, M) << \sigma_{\text{max}}$, making $P_{\sigma} \approx 1$.
+\input{discussion.tex}
 
-\par Overall, delta-tracking is significantly more computationally efficient for domains with similar cross-sections and can be shown to yield equivalent results to surface-tracking.
-
-\subsection{PHOTON INTERACTIONS}
-If a delta interaction does not occur, then a real interaction is sampled. Therefore, the probability of a real interaction $P_r$ is directly related to $P_\delta$ by
-
-\begin{equation}
-    P_r = 1 - P_\delta,
-\end{equation}
-where $P_\delta$ is given by Eq. \ref{eq:4}.
-\\
-\par If a real interaction occurs in material M, then probability of interaction $i$ occurring is
-\begin{equation}
-    P_i = \frac{\sigma_i(E, M)}{\sigma (E, M)},
-\end{equation}
-where $\sigma_i$ is the cross-section of interaction $i$.\\
-
-If there are $N$ possible interactions for a particular $E$ and $M$, then $\sigma (E, M)$ is calculated as so
-
-\begin{equation}
-    \sigma (E, M) = \sum_{i=1}^{N} \sigma_i(E, M).
-\end{equation}
-
-
-\par For x-rays, there are three possible photon interactions: \\
-
-\begin{large}
-    \bf{1. Photoelectric Effect}
-\end{large}
-
-\par In the photoelectric effect model used in MIDSX, a rather simple approach is taken. When a photon interacts with an atom's electron, the photon is terminated and all energy is deposited at the location of interaction. In general purpose particle transport code systems, when a photoelectric interaction occurs, a photon of energy $E$ is absorbed by an electron in subshell $i$, causing the electron to leave the atom with energy $E_e = E - U_i$, where $U_i$ is the binding energy of the $i$th subshell. In addition, photons are emitted due to atomic relaxations. For photon energies in the medical imaging range (30 - 120 keV), the energy of the released electrons does not allow for significant traversal through typically used materials, such as tissue, bone, and fat. This limited traversal results in a localized dose distribution, in turn, validating the model used by MIDSX. \\
-
-\begin{large}
-    \bf{2. Coherent Scattering}
-\end{large}
-
-\par Thomson scattering is defined as an incoming photon of energy $E$ elastically scattering with a free electron at rest, resulting in a scattered photon of same energy $E$. The atomic DCS per unit solid angle $\Omega$ for the interaction can be derived with classical electrodynamics, and is given by
-
-\begin{equation}
-    \frac{d\sigma_T}{d\Omega} = r_e^2 \frac{1 + \cos^2(\theta)}{2},
-\end{equation}
-where $r_e^2$ is the classical electron radius. \\
-In an atom, photons scatter off bound electrons rather than the free electrons described by Thomson scattering, resulting in what is known as coherent (Rayleigh) scattering at . The DCS per unit solid angle $\Omega$ of the interaction, ignoring absorption edge effects, is given by
-
-\begin{equation}
-    \frac{d\sigma_{Co}}{d\Omega} = \frac{d\sigma_T}{d\Omega} F(x, Z),
-\end{equation}
-
-where $x$ is the momentum transfer between the photon and atom, $Z$ is the atomic number of the atom, and $F(x, Z)$ is the atomic form factor. $x$ is related to the scattering angle $\theta$ by
-
-
-\begin{equation}
-    x = ak\sqrt{1 - \cos\theta},
-\end{equation}
-
-where
-
-\begin{align}
-    a = \frac{m_e c^2}{\sqrt{2}hc} && \rm{and} && k = \frac{E}{m_e c^2},
-\end{align}
-
-where $m_e$ is the mass of an electron, $c$ is the speed of light, and $h$ is Planck's constant. \\
-
-The DCS per unit solid angle $\Omega$ can be integrated over $\phi$ to obtain the DCS per unit polar angle $\theta$:
-
-
-\begin{equation}
-    \frac{d\sigma_{Co}}{d\theta} = \pi r_e^2 \sin \theta (1 + \cos^2 \theta) F(x, Z)^2.
-\end{equation}
-
-\par The PDF of the polar angle $\theta$ is then given by
-
-\begin{equation}
-    p(\theta) d\theta = \frac{d\sigma_{Co}}{d\theta} \frac{1}{\sigma_{Co}} d\theta = \frac{\pi r_e^2}{\sigma_{Co}} \sin \theta (1 + \cos^2 \theta) F(x, Z)^2 d \theta.
-\end{equation}
-
-\par The PDF of $\theta$ can be transformed into a PDF of $\mu = \cos \theta$, resulting in
-
-\begin{equation}
-    p(\mu) = \frac{\pi r_e^2}{\sigma_{Co}} (1 + \mu^2) F(x, Z)^2.
-\end{equation}
-
-To then sample $\mu$ for a particular scattering event, the inversion method is used. In particular, a look up table for the CDF of $P(\mu)$ is generated for each material in the domain for a grid of $\mu$ values. The details of this algorithm are discussed in Appendix ... \\
-
-\begin{large}
-    \bf{3. Incoherent Scattering}
-\end{large}
-
-\par Incoherent (Compton) scattering is defined as an incoming photon of energy $E$ interacting with an atom's electron, resulting in a scattered photon of energy $E'$ and an released electron with energy $E_e = E - E' - U_i$, where $U_i$ is the binding energy of the interacting subshell. While coherent scattering effectively interacts with atom itself, incoherent scattering interacts with the electron. The DCS per unit solid angle $\Omega$ of the interaction was derived by Klein and Nishina in 1929, making it one of the first findings of quantum electrodynamics. The Klein-Nishina formula is given by
-
-\begin{equation}
-    \frac{d\sigma_{KN}}{d\Omega} = \frac{r_e^2}{2} \left(\frac{E'}{E}\right)^2 \left(\frac{E'}{E} + \frac{E}{E'} - \sin^2 \theta \right),
-\end{equation}
-
-\par Note that when $E' = E$, the KN DCS is equal to the Thomson DCS, showing that incoherent scattering is a generalization of coherent scattering for inelastic interactions. \\
-
-\par Applying conservation of energy and momentum to free electron at rest, the following equation can be derived relating the scattered photon energy $E'$ to the scattering angle $\theta$ and the incident photon energy $E$:
-
-\begin{equation}
-    E' = \frac{E}{1 + k(1 - \cos \theta)}.
-\end{equation}
-
-\par Similar to the Thomson DCS, the KN DCS assumes a free electron at rest. In an atom, the electron is bound, resulting in a modified DCS. In the case of incoherent scattering, the KN DCS is modified by the Coherent Scattering Function, making the DCS per unit solid angle $\Omega$ of the interaction
-
-\begin{equation}
-    \frac{d\sigma_{In}}{d\Omega} = \frac{d\sigma_{KN}}{d\Omega} S(x, Z).
-\end{equation}
-
-
-Instead of directly sampling the PDF of the DCS, $\mu$ is first sampled using the acceptance-rejection method developed by Ozmutlu, then $S(x, Z)$ is sampled once again with the acceptance-rejection method. The details of this algorithm are discussed in Appendix ... \\
-
-
-
-
-\section{METHODS}
-
-In order to simulate the transport of x-rays through a domain, the following is required:
-
-\begin{enumerate}
-    \item The geometry of the domain
-    \item The materials in the domain
-    \item The associated cross-sections, form factors, and scattering functions of the materials
-    \item The source of the x-rays (energy spectrum, position, and direction)
-    \item The number of photons to simulate
-\end{enumerate}
-
-and to retrieve information about the performed simulation, the following is required:
-
-\begin{enumerate}
-    \item Geometries to check for intersection
-    \item Quantities to tally
-    \item Derived quantities to calculate from tallied quantities
-\end{enumerate}
-
-\subsection{GEOMETRY}
-\par In MIDSX, the geometry of the domain is represented by a 3D array of voxels, with each voxel being assigned a material ID. The domain is assigned a particular size, indicated by its spatial extent along the x, y, and z dimensions. In addition, the domain is assigned a background material ID. Geometries inside the domain are specified by NIFTI files. These NIFTI files are assigned material IDs, spatial size, voxel size, and an origin, which is the location of the voxel in the domain that corresponds to the origin of the NIFTI file. After constructing the NIFTI files, the domain is defined by supplying the background material ID, domain size, and a list of NIFTI files into a custom .domain file, which is then read by the MIDSX executable. \\
-\par In the code, both a \code{VoxelGrid} and \code{ComputationalDomain} object are created, with the ComputationalDomain consisting of the specified dimensions, background material ID, and a vector of VoxelGrid objects which are created via the provided NIFTI files. Do determine the current material of a photon, it is first determined if the photon is inside the ComputationalDomain. If so, it then checks if the photon is inside any of the VoxelGrid objects. If so, it is then determined which Voxel the photon is located inside the Voxel, then the corresponding material ID is returned. If the photon is not inside the ComputationalDomain, then the photon is terminated. \\
-
-\subsection{MATERIALS \& DATA}
-\par In order to simulate the transport of x-rays through a domain, the materials in the domain must be specified. In MIDSX, materials are all defined in an SQLite database, which is read by the MIDSX executable. The database contains the following information for each element:
-
-\begin{enumerate}
-    \item Symbol
-    \item Atomic Number
-    \item Mass
-    \item Mass Density
-    \item Number Density
-    \item Mass Number
-\end{enumerate}
-
-All of the above data was obtained from the periodictable and mendeleev python packages. In addition, the database contains the following data from the EPDL database for each element:
-
-\begin{enumerate}
-    \item Total Microscopic Cross-Section
-    \item Photoelectric Microscopic Cross-Section
-    \item Coherent Scattering Microscopic Cross-Section
-    \item Incoherent Scattering Microscopic Cross-Section
-    \item Atomic Form Factor
-    \item Scattering Function
-\end{enumerate}
-
-\par In MIDSX, all the above data is initialized upon created creation of the InteractionData object with a vector of strings of materials names. These material names correspond to entries in the SQLite database, which contains a table of material compositions and mass densities which were obtained from NIST's XCOM database. The InteractionData object contains a map of Material objects with their names, along with additional computed data, such as the maximum cross-section which is used for delta-tracking. The Material objects construct the above data for the specified material by performing an additivity approximation of the data for each element in the material (ref). The data is seperated into two further objects: MaterialData and MaterialProperties. MaterialData contains the microscopic cross-sections, form factors, and scattering functions, while MaterialProperties contains the mass density, number density, and mass.
-
-In addition to retrieving and storing the above data, the MaterialData object constructs interpolators for all its data. The interpolators for each type of data vary depending on its shape. For example, the photoelectric and total cross-sections are interpolated with a log-log linear interpolator, while the incoherent and coherent cross-sections are interpolated with a log-log cubic spline interpolator. Below is a figure of .\\
-
-\subsection{Source}
-    To create generate the initial position, direction, and energy of a photon, a PhotonSource object is initialized with a SourceGeometry, Directionality, and an EnergySpectrum object. The three initializing object are virtual classes, allowing the user to specify the attributes of the source. The inheritance structure is shown in Fig (). 
-
-
-\subsection{Tallies}
-\par To measure simulation data, one must first decide when to trigger the measurement. In particular, MIDSX supports both surface and volume geometries that trigger when a photon passes through or enters the geometry, respectfully. For surfaces, users can choose discs and rectangles, while for volumes, there are only cuboids at the moment.
-\par At the start of the simulations, users can specify quantities that they want measured upon the trigger of a specific geometry. For surfaces, these include incident photon energy, entrance cosine, and number of photons, while for volumes, in addition to their own implementation of incident energy and number of photons, the quantities energy deposition and number of interactions are available for measurement. Furthermore, each quantity has the ability to specify between photons that underwent a single coherent scatter, a single incoherent scatter, multiple scatters, and no scatters. While this does noticeably increase the computation time, it was necessary to validate the interaction models used in MIDSX.
-\par At the end of simulation, one might want to calculate additional derived quantities from the tallied quantities from the simulation. With this mind, MIDSX contains a DerivedQuantity object that can calculate planar fluence and air kerma, which were initially implemented for half-value-layer experiments.
-\vspace{1cm}
-\par Using the described theory and methodology, the object PhysicsEngine transports a photon through the computational domain until termination. This process is described in Figure \ref{figure:PhysicsEngineFlowChart}.
-
-
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/physics_engine_flow_chart.pdf}
-	\caption{Diagram of GE MiniView 6800 Mini C-Arm used in effective energy measurements.}
-	\label{figure:PhysicsEngineFlowChart}
-\end{figure}
-
-
-\newpage
-\section{Results}
-\par In order to validate the accuracy of MIDSX, half-value layer, radiography, and voxelized-volume simulations were performed and compared to reference data obtained by Sechopoulos et al \cite{sechopoulos_monte_2015}; these simulations correspond to cases 1, 2, and 5, respectively.
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/HVL_and_QVL_paper_ready.pdf}
-	\caption{Results for the (a) HVL and (b) QVL simulations as described by Case 1. The ratios of the primary HVL and QVL air kermas to the primary background air kermas is represented by $R_1$ and $R_2$, respectively. The simulation was performed for the monoenergetic energies 30 keV and 100 keV, along with the polyenergetic spectrums of 30 kVp and 100 kVp, which were provided by Sechopoulos et al.}
-	\label{figure:HVLGraph}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/ROI_0_deg_paper_ready.pdf}
-	\caption{The energy per initial photon (eV/photon) of photons incident upon each region of interest (ROI) for the $0^\circ$, full-field, 56.4 keV simulation as described by Case 2. The incident energy was determined separately for photons that underwent (a) no real interactions, (b) a single incoherent scatter, (c) a single coherent scatter, (d) and multiple scatters.}
-	\label{figure:ROIFFGraph}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/ROI_0_deg_pencil_paper_ready.pdf}
-	\caption{The energy per initial photon (eV/photon) of photons incident upon each region of interest (ROI) for the $0^\circ$, pencil beam, 56.4 keV simulation as described by Case 2. The incident energy was determined separately for photons that underwent (a) a single incoherent scatter, (b) a single coherent scatter, (c) and multiple scatters.}
-	\label{figure:ROIPGraph}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/radiography_body_dep_paper_ready.pdf}
-	\caption{The energy deposited per initial photon (eV/photon) in the simulated tissue for the full-field simulation as described by Case 2. The simulation was performed at 56.4 keV and 120 kVp at both (a) $0^\circ$ and (b) $15^\circ$, with the 120 kVp spectrum provided by Sechopoulos et al.}
- 	\label{figure:BDGraph}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/VOI_paper_ready.pdf}
-	\caption{The energy deposited per initial photon (eV/photon) in the volumes of interests (VOIs) for the $0^\circ$, full field, 56.4 keV simulation as described by Case 2. The energy deposited was determined separately for photons that underwent (a) no real interactions, (b) a single incoherent scatter, (c) a single coherent scatter, (d) and multiple scatters.}
-	\label{figure:VOIFFGraph}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-	\includegraphics[width=1.0\textwidth]{../figures/CT_564_180.pdf}
-	\caption{The energy deposited per initial photon (eV/photon) in the material IDs for the $180^\circ$, 56.4 keV simulation as described by Case 5.}
-	\label{figure:CTGraph}
-\end{figure}
 
 
 
@@ -339,7 +93,7 @@ REV\TeX{}, offering suggestions and encouragement, testing new versions,
 \end{acknowledgments}
 
 % \nocite{*}
-\bibliography{main.bib}
+\bibliography{main}
 
 \end{document}
 

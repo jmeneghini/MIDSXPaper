@@ -1,0 +1,141 @@
+\section{TRANSPORT THEORY}
+\par In order to represent the computational domain discretely, space is broken up into a grid of voxels (a pixel with volume), with each voxel being assigned a particular material ID depending on the geometries and compounds/elements in the domain. With our discrete space, given a photon position $\vecb{r}{}{}$, the corresponding voxel in which the photon resides can be calculated. Therefore, a particular material can be associated with all possible $\vecb{r}{}{}$'s in the domain.
+
+\par A photon's position in space after taking the $n$-th step in the domain $\vecb{r}{n}{}$ is represented by the following parametric ray equation:
+\begin{equation} \label{eq:1}
+    \vecb{r}{n}{} = \vecb{r}{n-1}{} + \uvecb{d}{}{} t_n,
+\end{equation}
+where $\vecb{r}{n-1}{}$ is the initial position before the $n$-th step, $\uvecb{d}{}{}$ is a unit vector in the direction of the step, and $t_n$ is the distance of the $n$-th step.
+
+\par In order to sample $t_n$, we utilize the following probability distribution function (PDF) $p(t)$ of the distance traveled $t$ by a photon of energy $E$ through material $M$ before interacting:
+\begin{equation} \label{eq:2}
+    p(t) = n\sigma \exp{\left[-t(n\sigma)\right]},
+\end{equation}
+where $n$ is the number density of $M$ and $\sigma = \sigma(E, M)$ is the microscopic cross-section of $M$ at $E$.
+\par Using the inversion method for sampling a PDF, it follows that random values of the free path $t$ can be generated with the following equation:
+\begin{equation} \label{eq:3}
+    t = -\frac{1}{n\sigma} \ln \gamma,
+\end{equation}
+where $\gamma$ is a uniformly distributed random number in the interval $(0, 1)$. This value of $t$ is sampled for each step and is used as $t_n$ in Eq \ref{eq:1} to determine the length of the $n$-th step.
+\\
+
+\subsection{SURFACE AND DELTA-TRACKING}
+
+\par If, after taking a step, the photon lands in a voxel with a different material, then the corresponding free path for the new material to be accounted for. This method, called surface-tracking, requires photons to be stopped at voxel boundaries and intersections with surrounding voxels to be calculated, which can be computationally intensive for materials that have a large average free path. 
+\par Alternatively, the delta-tracking algorithm offers a solution by sampling the maximum cross-section $\sigma_{\text{max}}$ in the computational domain. This, in turn, brings down the average free path to the minimum in the domain. To account for this decrease in free path, the algorithm introduces delta interactions as an alternative to real interactions, resulting in no change to the energy or direction. The probability of delta interaction $P_{\delta}$ is given by the following equation:
+
+\begin{equation} \label{eq:4}
+    P_{\delta} = \frac{\sigma_{\text{max}}(E) - \sigma(E, M)}{\sigma_{\text{max}}(E)},
+\end{equation}
+
+where $E$ is the energy of the photon undergoing the step, and $M$ is the material corresponding to the position of the photon at the end of the step. Note that when the photon lands in the material corresponding to the maximum cross-section, $\sigma(E, M) = \sigma_{\text{max}}$ and $P_{\delta} = 0$. On the contrary, if the photon landed in air and the domain's maximum cross-section corresponded to lead, then $\sigma(E, M) << \sigma_{\text{max}}$, making $P_{\sigma} \approx 1$.
+
+\par Overall, delta-tracking is significantly more computationally efficient for domains with similar cross-sections and can be shown to yield equivalent results to surface-tracking.
+
+\subsection{PHOTON INTERACTIONS}
+If a delta interaction does not occur, then a real interaction is sampled. Therefore, the probability of a real interaction $P_r$ is directly related to $P_\delta$ by
+
+\begin{equation}
+    P_r = 1 - P_\delta,
+\end{equation}
+where $P_\delta$ is given by Eq. \ref{eq:4}.
+\\
+\par If a real interaction occurs in material M, then probability of interaction $i$ occurring is
+\begin{equation}
+    P_i = \frac{\sigma_i(E, M)}{\sigma (E, M)},
+\end{equation}
+where $\sigma_i$ is the cross-section of interaction $i$.\\
+
+If there are $N$ possible interactions for a particular $E$ and $M$, then $\sigma (E, M)$ is calculated as so
+
+\begin{equation}
+    \sigma (E, M) = \sum_{i=1}^{N} \sigma_i(E, M).
+\end{equation}
+
+
+\par For x-rays, there are three possible photon interactions: \\
+
+\begin{large}
+    \bf{1. Photoelectric Effect}
+\end{large}
+
+\par In the photoelectric effect model used in MIDSX, a rather simple approach is taken. When a photon interacts with an atom's electron, the photon is terminated and all energy is deposited at the location of interaction. In general purpose particle transport code systems, when a photoelectric interaction occurs, a photon of energy $E$ is absorbed by an electron in subshell $i$, causing the electron to leave the atom with energy $E_e = E - U_i$, where $U_i$ is the binding energy of the $i$th subshell. In addition, photons are emitted due to atomic relaxations. For photon energies in the medical imaging range (30 - 120 keV), the energy of the released electrons does not allow for significant traversal through typically used materials, such as tissue, bone, and fat. This limited traversal results in a localized dose distribution, in turn, validating the model used by MIDSX. \\
+
+\begin{large}
+    \bf{2. Coherent Scattering}
+\end{large}
+
+\par Thomson scattering is defined as an incoming photon of energy $E$ elastically scattering with a free electron at rest, resulting in a scattered photon of same energy $E$. The atomic DCS per unit solid angle $\Omega$ for the interaction can be derived with classical electrodynamics, and is given by
+
+\begin{equation}
+    \frac{d\sigma_T}{d\Omega} = r_e^2 \frac{1 + \cos^2(\theta)}{2},
+\end{equation}
+where $r_e^2$ is the classical electron radius. \\
+In an atom, photons scatter off bound electrons rather than the free electrons described by Thomson scattering, resulting in what is known as coherent (Rayleigh) scattering at . The DCS per unit solid angle $\Omega$ of the interaction, ignoring absorption edge effects, is given by
+
+\begin{equation}
+    \frac{d\sigma_{Co}}{d\Omega} = \frac{d\sigma_T}{d\Omega} F(x, Z),
+\end{equation}
+
+where $x$ is the momentum transfer between the photon and atom, $Z$ is the atomic number of the atom, and $F(x, Z)$ is the atomic form factor. $x$ is related to the scattering angle $\theta$ by
+
+
+\begin{equation}
+    x = ak\sqrt{1 - \cos\theta},
+\end{equation}
+
+where
+
+\begin{align}
+    a = \frac{m_e c^2}{\sqrt{2}hc} && \rm{and} && k = \frac{E}{m_e c^2},
+\end{align}
+
+where $m_e$ is the mass of an electron, $c$ is the speed of light, and $h$ is Planck's constant. \\
+
+The DCS per unit solid angle $\Omega$ can be integrated over $\phi$ to obtain the DCS per unit polar angle $\theta$:
+
+
+\begin{equation}
+    \frac{d\sigma_{Co}}{d\theta} = \pi r_e^2 \sin \theta (1 + \cos^2 \theta) F(x, Z)^2.
+\end{equation}
+
+\par The PDF of the polar angle $\theta$ is then given by
+
+\begin{equation}
+    p(\theta) d\theta = \frac{d\sigma_{Co}}{d\theta} \frac{1}{\sigma_{Co}} d\theta = \frac{\pi r_e^2}{\sigma_{Co}} \sin \theta (1 + \cos^2 \theta) F(x, Z)^2 d \theta.
+\end{equation}
+
+\par The PDF of $\theta$ can be transformed into a PDF of $\mu = \cos \theta$, resulting in
+
+\begin{equation}
+    p(\mu) = \frac{\pi r_e^2}{\sigma_{Co}} (1 + \mu^2) F(x, Z)^2.
+\end{equation}
+
+To then sample $\mu$ for a particular scattering event, the inversion method is used. In particular, a look up table for the CDF of $P(\mu)$ is generated for each material in the domain for a grid of $\mu$ values. The details of this algorithm are discussed in Appendix ... \\
+
+\begin{large}
+    \bf{3. Incoherent Scattering}
+\end{large}
+
+\par Incoherent (Compton) scattering is defined as an incoming photon of energy $E$ interacting with an atom's electron, resulting in a scattered photon of energy $E'$ and an released electron with energy $E_e = E - E' - U_i$, where $U_i$ is the binding energy of the interacting subshell. While coherent scattering effectively interacts with atom itself, incoherent scattering interacts with the electron. The DCS per unit solid angle $\Omega$ of the interaction was derived by Klein and Nishina in 1929, making it one of the first findings of quantum electrodynamics. The Klein-Nishina formula is given by
+
+\begin{equation}
+    \frac{d\sigma_{KN}}{d\Omega} = \frac{r_e^2}{2} \left(\frac{E'}{E}\right)^2 \left(\frac{E'}{E} + \frac{E}{E'} - \sin^2 \theta \right),
+\end{equation}
+
+\par Note that when $E' = E$, the KN DCS is equal to the Thomson DCS, showing that incoherent scattering is a generalization of coherent scattering for inelastic interactions. \\
+
+\par Applying conservation of energy and momentum to free electron at rest, the following equation can be derived relating the scattered photon energy $E'$ to the scattering angle $\theta$ and the incident photon energy $E$:
+
+\begin{equation}
+    E' = \frac{E}{1 + k(1 - \cos \theta)}.
+\end{equation}
+
+\par Similar to the Thomson DCS, the KN DCS assumes a free electron at rest. In an atom, the electron is bound, resulting in a modified DCS. In the case of incoherent scattering, the KN DCS is modified by the Coherent Scattering Function, making the DCS per unit solid angle $\Omega$ of the interaction
+
+\begin{equation}
+    \frac{d\sigma_{In}}{d\Omega} = \frac{d\sigma_{KN}}{d\Omega} S(x, Z).
+\end{equation}
+
+
+Instead of directly sampling the PDF of the DCS, $\mu$ is first sampled using the acceptance-rejection method developed by Ozmutlu, then $S(x, Z)$ is sampled once again with the acceptance-rejection method. The details of this algorithm are discussed in Appendix ... \\
