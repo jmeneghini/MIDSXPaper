@@ -1,3 +1,15 @@
+@article{lauer2009elements,
+  title={Elements of danger—the case of medical imaging},
+  author={Lauer, Michael S},
+  journal={Minnesota Medicine},
+  volume={92},
+  number={12},
+  pages={40},
+  year={2009}
+}
+
+
+
 @inproceedings{nifti2004,
 author = {Cox, R.W. and Ashburner, John and Breman, Hester and Fissell, 
 Kate and Haselgrove, C. and Holmes, C.J. and Lancaster, J.L. and Rex, D.E. 
@@ -10,6 +22,63 @@ volume = {22},
 journal = {10th Annual Meeting of the Organization for Human Brain 
 Mapping}
 }
+
+@inbook{essmedphys2012,
+    author    = {Bushberg, Jerrold T. and Seibert, J. Anthony and Leidholdt, Jr., Edwin M. and Boone, John M.},
+    title     = {X-ray Dosimetry in Projection Imaging and Computed Tomography},
+    chapter   = {11},
+    pages     = {375-401},
+    publisher = {Wolters Kluwer Health/Lippincott Williams \& Wilkins},
+    year      = {2012},
+    booktitle = {The essential physics of medical imaging},
+    edition   = {3rd}
+}
+
+@article{fernandez_bosman_validation_2021,
+	title = {Validation of the {MC}-{GPU} {Monte} {Carlo} code against the {PENELOPE}/{penEasy} code system and benchmarking against experimental conditions for typical radiation qualities and setups in interventional radiology and cardiology},
+	volume = {82},
+	issn = {11201797},
+	url = {https://linkinghub.elsevier.com/retrieve/pii/S1120179721000788},
+	doi = {10.1016/j.ejmp.2021.01.075},
+	language = {en},
+	urldate = {2023-10-24},
+	journal = {Physica Medica},
+	author = {Fernández Bosman, David and García Balcaza, Victor and Delgado, Clara and Principi, Sara and Duch, Maria Amor and Ginjaume, Mercè},
+	month = feb,
+	year = {2021},
+	pages = {64--71},
+}
+
+@article{geant4valid2004,
+author = {Carrier, J.-F. and Archambault, L. and Beaulieu, L. and Roy, R.},
+title = {Validation of GEANT4, an object-oriented Monte Carlo toolkit, for simulations in medical physics},
+journal = {Medical Physics},
+volume = {31},
+number = {3},
+pages = {484-492},
+keywords = {Monte Carlo, dosimetry, GEANT4, validation, Monte Carlo methods, Monte Carlo methods, medical computing, software packages, phantoms, electron beams, dosimetry, photons, Monte Carlo methods, Medical physics, Electron beams, Medical physicists, Particle beam sources, Photons, Physicists, Multilayers},
+doi = {https://doi.org/10.1118/1.1644532},
+url = {https://aapm.onlinelibrary.wiley.com/doi/abs/10.1118/1.1644532},
+eprint = {https://aapm.onlinelibrary.wiley.com/doi/pdf/10.1118/1.1644532},
+abstract = {GEANT4 (GEometry ANd Tracking 4) is an object-oriented Monte Carlo simulation toolkit that has been developed by a worldwide collaboration of scientists. It simulates the passage of particles through matter. In order to validate GEANT4 for medical physics applications, different simulations are conducted. The results are compared to published results based on three Monte Carlo codes widely used in medical physics: MCNP, EGS4, and EGSnrc. When possible, the simulation results are also compared to experimental data. Different geometries are tested (multilayer and homogeneous phantoms), different sources considered (point-source and broad parallel beam), and different primary particles simulated (photons and electrons) at different energies. For the heterogeneous media, there are notable differences between the Monte Carlo codes reaching up to over 5\% in relative difference. For the monoenergetic electrons in a homogeneous medium, the difference between GEANT4 and the experimental measurements is similar to the difference between EGSnrc and the experimental measurements; for the depth-dose curves, the difference expressed as a fraction of the peak dose is always smaller than 4\%. We conclude that GEANT4 is a promising Monte Carlo simulation toolkit for low-energy medical applications.},
+year = {2004}
+}
+
+
+@book{vassiliev_monte_2017,
+	address = {Cham},
+	series = {Biological and {Medical} {Physics}, {Biomedical} {Engineering}},
+	title = {Monte {Carlo} {Methods} for {Radiation} {Transport}},
+	isbn = {978-3-319-44140-5 978-3-319-44141-2},
+	language = {en},
+	urldate = {2023-05-28},
+	publisher = {Springer International Publishing},
+	author = {Vassiliev, Oleg N.},
+	year = {2017},
+	doi = {10.1007/978-3-319-44141-2},
+}
+
+
 
 @techreport{kahn1956,
   author    = {Kahn, H.},
@@ -46,26 +115,28 @@ Mapping}
 	file = {2019 - PENELOPE-2018 A Code System for Monte Carlo Simul.pdf:files/108/2019 - PENELOPE-2018 A Code System for Monte Carlo Simul.pdf:application/pdf},
 }
 
-@book{vassiliev_monte_2017,
-	address = {Cham},
-	series = {Biological and {Medical} {Physics}, {Biomedical} {Engineering}},
-	title = {Monte {Carlo} {Methods} for {Radiation} {Transport}},
-	isbn = {978-3-319-44140-5 978-3-319-44141-2},
-	url = {http://link.springer.com/10.1007/978-3-319-44141-2},
-	language = {en},
-	urldate = {2023-05-28},
-	publisher = {Springer International Publishing},
-	author = {Vassiliev, Oleg N.},
-	year = {2017},
-	doi = {10.1007/978-3-319-44141-2},
-	file = {Vassiliev - 2017 - Monte Carlo Methods for Radiation Transport.pdf:files/109/Vassiliev - 2017 - Monte Carlo Methods for Radiation Transport.pdf:application/pdf},
-}
 
 @misc{hubbell_x-ray_2004,
 	title = {X-{Ray} {Mass} {Attenuation} {Coefficients}},
 	doi = {10.18434/T4D01F},
 	author = {Hubbell, J. H. and Seltzer, S. M.},
 	year = {2004},
+}
+
+@techreport{lund2018implementation,
+  title={Implementation and validation of photon transport in openmc},
+  author={Lund, Amanda L and Romano, Paul K},
+  year={2018},
+  institution={Argonne National Lab.(ANL), Argonne, IL (United States)}
+}
+
+@misc{MIDSX2023,
+  author = {Meneghini, John},
+  title = {{MIDSX}},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  url = {https://github.com/jmeneghini/MIDSX}
 }
 
 @incollection{HUSSEIN2007153,
