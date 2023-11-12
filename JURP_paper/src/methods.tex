@@ -1,3 +1,11 @@
+\section{IMPLEMENTATION}
+\par To simulate x-ray transport in MIDSX, the domain's geometry is represented using a 3D voxel array with each voxel assigned a material ID. Geometries are defined by NIFTI files \cite{nifti2004} and incorporated into a custom .domain file. These geometries are represented by \code{VoxelGrid} objects which are contained within \code{ComputationalDomain} objects.
+\par Materials are defined in an SQLite database \cite{sqlite2020hipp}, which also contains elemental data from \cite{periodictable2022} and \cite{mendeleev2021}, and interaction data from the EPDL database \cite{cullen_survey_nodate}. The \code{InteractionData} object initializes this material data with various interpolation methods, including linear and spline interpolation.
+\par The \code{PhotonSource} object, initialized with \code{SourceGeometry}, \code{Directionality}, and \code{EnergySpectrum}, determines the photon's initial attributes. MIDSX provides measurement triggers through surface and volume tallies. The geometries of these tallies correspond to regions of interest (ROI) and volumes of interest (VOI), respectively. Users can specify desired tally quantities via the \code{Quantity} and \code{QuantityContainer} objects, with post-simulation derived quantities like air kerma computed using the \code{DerivedQuantity} object.
+\par For more details on the implementation of MIDSX, see the source code \cite{MIDSX2023}.
+
+
+
 % \section{METHODS}
 
 % In order to simulate the transport of x-rays through a domain, the following is required:
@@ -68,15 +76,6 @@
 % 	\caption{Diagram of GE MiniView 6800 Mini C-Arm used in effective energy measurements.}
 % 	\label{fig:PhysicsEngineFlowChart}
 % \end{figure}
-
-\section{IMPLEMENTATION}
-
-\par To simulate x-ray transport in MIDSX, the domain's geometry is represented using a 3D voxel array with each voxel assigned a material ID. Geometries are defined by NIFTI files \cite{nifti2004} and incorporated into a custom .domain file. These geometries are represented by \code{VoxelGrid} objects which are contained within \code{ComputationalDomain} objects.
-\par Materials are defined in an SQLite database \cite{sqlite2020hipp}, which also contains elemental data from \cite{periodictable2022} and \cite{mendeleev2021}, and interaction data from the EPDL database \cite{cullen_survey_nodate}. The \code{InteractionData} object initializes this material data with various interpolation methods, including linear and spline interpolation.
-\par The \code{PhotonSource} object, initialized with \code{SourceGeometry}, \code{Directionality}, and \code{EnergySpectrum}, determines the photon's initial attributes. MIDSX provides measurement triggers through surface and volume tallies. The geometries of these tallies correspond to regions of interest (ROI) and volumes of interest (VOI), respectively. Users can specify desired tally quantities via the \code{Quantity} and \code{QuantityContainer} objects, with post-simulation derived quantities like air kerma computed using the \code{DerivedQuantity} object.
-\par For more details on the implementation of MIDSX, see the source code \cite{MIDSX2023}.
-
-
 % \begin{figure}[H]
 %     \centering
 % 	\includegraphics[width=0.9\textwidth]{../figures/physics_engine_flow_chart.pdf}
