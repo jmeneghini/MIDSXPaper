@@ -17,24 +17,26 @@ where $n$ is the number density of $M$ and $\sigma = \sigma(E, M)$ is the micros
     $
     %inlining for space concerns
 where $\gamma$ is a uniformly distributed random number in the interval $[0, 1]$. This value of $t$ is sampled for each step and is used as $t_n$ in Equation \ref{eq:1} to determine the length of the $n$-th step \cite{vassiliev_monte_2017}.
+\par If, after taking a step, the photon lands in a voxel with a different material (an inhomogeneous domain), then the corresponding free path for the new material must be calculated. To accomplish this, MIDSX employs $\delta$-tracking, which is significantly more computationally efficient for domains with similar cross-sections \cite{vassiliev_monte_2017}.
 
-\subsection{SURFACE AND $\delta$-TRACKING}
 
-\par If, after taking a step, the photon lands in a voxel with a different material (an inhomogeneous domain), then the corresponding free path for the new material must be accounted for. One method, called surface-tracking, requires photons to be stopped at voxel boundaries and intersections with surrounding voxels to be calculated, which can be computationally intensive for materials that have a large average free path. 
-\par Alternatively, the $\delta$-tracking algorithm offers a solution by sampling the maximum cross-section $\sigma_{\text{max}}$ in the computational domain. This, in turn, brings down the average free path to the minimum in the domain. To account for this decrease in free path, the algorithm introduces $\delta$ interactions as an alternative to real interactions, resulting in no change to the energy or direction. The probability of a $\delta$ interaction $P_{\delta}$ is given by 
-    $
-    P_{\delta} = \frac{\sigma_{\text{max}}(E) - \sigma(E, M)}{\sigma_{\text{max}}(E)},
-    $
+% \subsection{SURFACE AND $\delta$-TRACKING}
 
-where $E$ is the energy of the photon undergoing the step. When the photon lands in the material corresponding to the maximum cross-section, $\sigma(E, M) = \sigma_{\text{max}}$ and $P_{\delta} = 0$. On the contrary, if the photon landed in air and the domain's maximum cross-section corresponded to lead, then $\sigma(E, M) << \sigma_{\text{max}}$, making $P_{\sigma} \approx 1$.
+% \par If, after taking a step, the photon lands in a voxel with a different material (an inhomogeneous domain), then the corresponding free path for the new material must be accounted for. One method, called surface-tracking, requires photons to be stopped at voxel boundaries and intersections with surrounding voxels to be calculated, which can be computationally intensive for materials that have a large average free path. 
+% \par Alternatively, the $\delta$-tracking algorithm offers a solution by sampling the maximum cross-section $\sigma_{\text{max}}$ in the computational domain. This, in turn, brings down the average free path to the minimum in the domain. To account for this decrease in free path, the algorithm introduces $\delta$ interactions as an alternative to real interactions, resulting in no change to the energy or direction. The probability of a $\delta$ interaction $P_{\delta}$ is given by 
+%     $
+%     P_{\delta} = \frac{\sigma_{\text{max}}(E) - \sigma(E, M)}{\sigma_{\text{max}}(E)},
+%     $
 
-\par Overall, $\delta$-tracking is significantly more computationally efficient for domains with similar cross-sections and can be shown to yield equivalent results to surface-tracking \cite{vassiliev_monte_2017}.
+% where $E$ is the energy of the photon undergoing the step. When the photon lands in the material corresponding to the maximum cross-section, $\sigma(E, M) = \sigma_{\text{max}}$ and $P_{\delta} = 0$. On the contrary, if the photon landed in air and the domain's maximum cross-section corresponded to lead, then $\sigma(E, M) << \sigma_{\text{max}}$, making $P_{\sigma} \approx 1$.
 
-\subsection{PHOTON INTERACTIONS}
-If a $\delta$ interaction does not occur, then a real interaction is sampled. Therefore, the probability of a real interaction $P_r$ is directly related to $P_\delta$ by
-    $
-    P_r = 1 - P_\delta.
-    $ If a real interaction occurs in material M, then the probability of interaction $i$ occurring is $P_i = \frac{\sigma_i(E, M)}{\sigma (E, M)}$ where $\sigma_i$ is the cross-section of interaction $i$. If there are $N$ possible interactions for a particular $E$ and $M$, then $\sigma (E, M)$ is simply the sum of each interaction's cross-section.
+% \par Overall, $\delta$-tracking is significantly more computationally efficient for domains with similar cross-sections and can be shown to yield equivalent results to surface-tracking \cite{vassiliev_monte_2017}.
+
+% \subsection{PHOTON INTERACTIONS}
+% If a $\delta$ interaction does not occur, then a real interaction is sampled. Therefore, the probability of a real interaction $P_r$ is directly related to $P_\delta$ by
+%     $
+%     P_r = 1 - P_\delta.
+%     $ If a real interaction occurs in material M, then the probability of interaction $i$ occurring is $P_i = \frac{\sigma_i(E, M)}{\sigma (E, M)}$ where $\sigma_i$ is the cross-section of interaction $i$. If there are $N$ possible interactions for a particular $E$ and $M$, then $\sigma (E, M)$ is simply the sum of each interaction's cross-section.
 
 \par For x-rays, there are three possible photon interactions: photoelectric effect, coherent scattering, and incoherent scattering. For the photoelectric effect in MIDSX, the photon is terminated and all energy is deposited at the location of interaction. In general-purpose particle transport code systems, when a photoelectric interaction occurs, a photon of energy $E$ is absorbed by an electron in subshell $i$, causing the electron to leave the atom with energy $E_e = E - U_i$, where $U_i$ is the binding energy of the $i$th subshell. In addition, photons are emitted due to atomic relaxations. For photon energies in the medical imaging range (<120 keV), the energy of the released electrons does not allow for significant traversal through typical biological media. This limited traversal results in a localized dose distribution, in turn, validating the model used by MIDSX.
 
