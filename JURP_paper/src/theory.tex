@@ -1,13 +1,13 @@
 \section{TRANSPORT THEORY}
 \par To represent the computational domain discretely, space is broken up into a grid of voxels (volume pixel), with each voxel being assigned a particular material depending on the geometries and compounds/elements in the domain. Within our discrete space, given a photon position $\vecb{r}{}{}$, the corresponding voxel in which the photon resides can be calculated. Therefore, all possible $\vecb{r}{}{}$'s can be assigned a particular material $M$ in the domain.
 
-\par A photon's position in space after taking the $n$-th step in the domain, $\vecb{r}{n}{}$, is represented by the following parametric ray equation:
+\par A photon's position after taking the $n$-th step in the domain, $\vecb{r}{n}{}$, is represented by the parametric ray equation:
 \begin{equation} \label{eq:1}
     \vecb{r}{n}{} = \vecb{r}{n-1}{} + \uvecb{d}{}{} t_n,
 \end{equation}
 where $\vecb{r}{n-1}{}$ is the initial position before the $n$-th step, $\uvecb{d}{}{}$ is a unit vector in the direction of the step, and $t_n$ is the length of the $n$-th step.
 
-\par To randomly sample $t_n$ in a homogenous domain, we utilize the following probability density function (PDF) $p(t)$ of the distance traveled $t$ by a photon of energy $E$ through material $M$ before interacting:
+\par To randomly sample $t_n$ in a homogeneous domain, we utilize the following probability density function (PDF) $p(t)$ of the distance traveled $t$ by a photon of energy $E$ through material $M$ before interacting:
 \begin{equation} \label{eq:2}
     p(t) = n\sigma \exp{\left[-t(n\sigma)\right]},
 \end{equation}
@@ -16,8 +16,8 @@ where $n$ is the number density of $M$ and $\sigma = \sigma(E, M)$ is the micros
     t = -\frac{1}{n\sigma} \ln \gamma, 
     $
     %inlining for space concerns
-where $\gamma$ is a uniformly distributed random number in the interval $[0, 1]$. This value of $t$ is sampled for each step and is used as $t_n$ in Equation \ref{eq:1} to determine the length of the $n$-th step \cite{vassiliev_monte_2017}.
-\par If, after taking a step, the photon lands in a voxel with a different material (an inhomogeneous domain), then the corresponding free path for the new material must be calculated. To accomplish this, MIDSX employs $\delta$-tracking, which is significantly more computationally efficient for domains with similar cross-sections \cite{vassiliev_monte_2017}.
+where $\gamma$ is a uniformly distributed random number in the interval $[0, 1)$. This value of $t$ is sampled for each step and is used as $t_n$ in Equation \ref{eq:1} to determine the length of the $n$-th step \onlinecite{vassiliev_monte_2017}.
+\par If, after taking a step, the photon lands in a voxel with a different material (an inhomogeneous domain), then the corresponding free path for the new material must be calculated. To accomplish this, MIDSX employs $\delta$-tracking, which is significantly more computationally efficient for domains with similar cross-sections \onlinecite{vassiliev_monte_2017}.
 
 
 % \subsection{SURFACE AND $\delta$-TRACKING}
@@ -30,7 +30,7 @@ where $\gamma$ is a uniformly distributed random number in the interval $[0, 1]$
 
 % where $E$ is the energy of the photon undergoing the step. When the photon lands in the material corresponding to the maximum cross-section, $\sigma(E, M) = \sigma_{\text{max}}$ and $P_{\delta} = 0$. On the contrary, if the photon landed in air and the domain's maximum cross-section corresponded to lead, then $\sigma(E, M) << \sigma_{\text{max}}$, making $P_{\sigma} \approx 1$.
 
-% \par Overall, $\delta$-tracking is significantly more computationally efficient for domains with similar cross-sections and can be shown to yield equivalent results to surface-tracking \cite{vassiliev_monte_2017}.
+% \par Overall, $\delta$-tracking is significantly more computationally efficient for domains with similar cross-sections and can be shown to yield equivalent results to surface-tracking \onlinecite{vassiliev_monte_2017}.
 
 % \subsection{PHOTON INTERACTIONS}
 % If a $\delta$ interaction does not occur, then a real interaction is sampled. Therefore, the probability of a real interaction $P_r$ is directly related to $P_\delta$ by
@@ -40,7 +40,7 @@ where $\gamma$ is a uniformly distributed random number in the interval $[0, 1]$
 
 \par For x-rays, there are three possible photon interactions: photoelectric effect, coherent scattering, and incoherent scattering. For the photoelectric effect in MIDSX, the photon is terminated and all energy is deposited at the location of interaction. In general-purpose particle transport code systems, when a photoelectric interaction occurs, a photon of energy $E$ is absorbed by an electron in subshell $i$, causing the electron to leave the atom with energy $E_e = E - U_i$, where $U_i$ is the binding energy of the $i$th subshell. In addition, photons are emitted due to atomic relaxations. For photon energies in the medical imaging range (<120 keV), the energy of the released electrons does not allow for significant traversal through typical biological media. This limited traversal results in a localized dose distribution, in turn, validating the model used by MIDSX.
 
-\par For coherent and incoherent scattering, the methodology of \cite{lund2018implementation} was adapted for use in MIDSX, neglecting Doppler energy broadening and the production of secondary particles.
+\par For coherent and incoherent scattering, the methodology of \onlinecite{lund2018implementation} was adapted for use in MIDSX, neglecting Doppler energy broadening and the production of secondary particles.
 
 % \begin{large}
 %     \bf{1. Photoelectric Effect}
